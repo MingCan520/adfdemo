@@ -1,0 +1,24 @@
+{
+	"name": "tr_ingest_pop_trigger",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "pl_ingest_pop_data",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "BlobEventsTrigger",
+		"typeProperties": {
+			"blobPathBeginsWith": "/population/blobs/population_by_age.tsv.gz",
+			"ignoreEmptyBlobs": true,
+			"scope": "/subscriptions/c0415fb3-2b9e-4505-87d9-57a7d3c98943/resourceGroups/covid-reporting-rg/providers/Microsoft.Storage/storageAccounts/jimmycovidreporting",
+			"events": [
+				"Microsoft.Storage.BlobCreated"
+			]
+		}
+	}
+}

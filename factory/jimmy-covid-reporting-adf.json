@@ -1,0 +1,9 @@
+{
+	"name": "jimmy-covid-reporting-adf",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "259137ac-c81f-4a7d-be20-14653b08f1ac",
+		"tenantId": "418104fb-37c3-4ad8-8f3a-05f1634c1525"
+	}
+}
