@@ -19,6 +19,9 @@
 				},
 				{
 					"name": "selectOnlyRequiredField"
+				},
+				{
+					"name": "pivotCounts"
 				}
 			],
 			"scriptLines": [
@@ -47,7 +50,17 @@
 				"          source",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> selectOnlyRequiredField"
+				"     skipDuplicateMapOutputs: true) ~> selectOnlyRequiredField",
+				"selectOnlyRequiredField pivot(groupBy(country,",
+				"          country_code,",
+				"          population,",
+				"          source,",
+				"          date,",
+				"          country_special = country + country_code),",
+				"     pivotBy(indicator, ['confirmed cases', 'deaths']),",
+				"     count = sum(cases_count),",
+				"     columnNaming: '$N_$V',",
+				"     lateral: true) ~> pivotCounts"
 			]
 		}
 	}
