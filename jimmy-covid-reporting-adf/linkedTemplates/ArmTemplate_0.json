@@ -30,10 +30,6 @@
 		"ls_http_opendata_ecdc_europ_eu_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "@{linkedService().sourceBaseURL}"
-		},
-		"tr_ingest_pop_trigger_properties_typeProperties_scope": {
-			"type": "string",
-			"defaultValue": "/subscriptions/c0415fb3-2b9e-4505-87d9-57a7d3c98943/resourceGroups/covid-reporting-rg/providers/Microsoft.Storage/storageAccounts/jimmycovidreporting"
 		}
 	},
 	"variables": {
@@ -1043,12 +1039,14 @@
 						"     skipDuplicateMapOutputs: true) ~> selectForSink",
 						"selectForSink sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
+						"     partitionFileNames:['cases_and_deaths.csv'],",
 						"     truncate: true,",
 						"     umask: 0022,",
 						"     preCommands: [],",
 						"     postCommands: [],",
 						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> casesAndDDeathSink"
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> casesAndDDeathSink"
 					]
 				}
 			},
@@ -1059,33 +1057,52 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/tr_ingest_pop_trigger')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
+			"name": "[concat(parameters('factoryName'), '/pl_process_cases_and_deaths_data')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
+				"activities": [
 					{
-						"pipelineReference": {
-							"referenceName": "pl_ingest_pop_data",
-							"type": "PipelineReference"
+						"name": "Data flow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
 						},
-						"parameters": {}
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_tran_cases_deaths",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"CasesAndDeathSource": {},
+									"CountryLookup": {},
+									"casesAndDDeathSink": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine",
+							"runConcurrently": true
+						}
 					}
 				],
-				"type": "BlobEventsTrigger",
-				"typeProperties": {
-					"blobPathBeginsWith": "/population/blobs/population_by_age.tsv.gz",
-					"ignoreEmptyBlobs": true,
-					"scope": "[parameters('tr_ingest_pop_trigger_properties_typeProperties_scope')]",
-					"events": [
-						"Microsoft.Storage.BlobCreated"
-					]
-				}
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/pl_ingest_pop_data')]"
+				"[concat(variables('factoryId'), '/dataflows/df_tran_cases_deaths')]"
 			]
 		}
 	]

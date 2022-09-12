@@ -87,9 +87,6 @@
 					},
 					"ls_http_opendata_ecdc_europ_eu_properties_typeProperties_url": {
 						"value": "[parameters('ls_http_opendata_ecdc_europ_eu_properties_typeProperties_url')]"
-					},
-					"tr_ingest_pop_trigger_properties_typeProperties_scope": {
-						"value": "[parameters('tr_ingest_pop_trigger_properties_typeProperties_scope')]"
 					}
 				}
 			},
@@ -108,6 +105,9 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"tr_ingest_pop_trigger_properties_typeProperties_scope": {
+						"value": "[parameters('tr_ingest_pop_trigger_properties_typeProperties_scope')]"
 					},
 					"tumblingtrigger_properties_pipeline_parameters_startDate": {
 						"value": "[parameters('tumblingtrigger_properties_pipeline_parameters_startDate')]"
