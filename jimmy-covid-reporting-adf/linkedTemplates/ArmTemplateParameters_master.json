@@ -1,0 +1,42 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "jimmy-covid-reporting-adf"
+		},
+		"Is_ablob_covidreporting_connectionString": {
+			"value": ""
+		},
+		"SourceLinkedService_connectionString": {
+			"value": ""
+		},
+		"ls_adls_covidreportingdl_accountKey": {
+			"value": ""
+		},
+		"ls_adls_covidreportingdl_properties_typeProperties_url": {
+			"value": "https://jimmycovidreportingdl.dfs.core.windows.net/"
+		},
+		"ls_adls_covidreportingdl_connectionString": {
+			"value": ""
+		},
+		"ls_http_opendata_ecdc_europ_eu_properties_typeProperties_url": {
+			"value": "@{linkedService().sourceBaseURL}"
+		},
+		"tr_ingest_pop_trigger_properties_typeProperties_scope": {
+			"value": "/subscriptions/c0415fb3-2b9e-4505-87d9-57a7d3c98943/resourceGroups/covid-reporting-rg/providers/Microsoft.Storage/storageAccounts/jimmycovidreporting"
+		},
+		"tumblingtrigger_properties_pipeline_parameters_startDate": {
+			"value": "@trigger().outputs.windowStartTime"
+		},
+		"tumblingtrigger_properties_pipeline_parameters_endDate": {
+			"value": "@trigger().outputs.windowEndTime"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}
