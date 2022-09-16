@@ -597,7 +597,7 @@
 						"     skipDuplicateMapOutputs: true) ~> selectRequiredFields2",
 						"selectRequiredFields2 split(indicator == 'Weekly new hospital admissions per 100k' || indicator == 'Weekly new ICU admissions per 100k',",
 						"     disjoint: false) ~> splitDailyFromWeekly@(Weekly, Daily)",
-						"sourceDimDate aggregate(groupBy(ecdc_year_week = year + '-W' + lpad(week_of_year,2,'0')),",
+						"sourceDimDate aggregate(groupBy(ecdc_year_week = year+'-W'+lpad(week_of_year,2,'0')),",
 						"     week_start_date = min(date),",
 						"          week_end_date = max(date)) ~> aggregateDimDate",
 						"splitDailyFromWeekly@Weekly, aggregateDimDate join(reported_year_week == ecdc_year_week,",
@@ -657,18 +657,22 @@
 						"     skipDuplicateMapOutputs: true) ~> selectDaily",
 						"selectWeekly sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
+						"     partitionFileNames:['HA_Weekly'],",
 						"     umask: 0022,",
 						"     preCommands: [],",
 						"     postCommands: [],",
 						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> sinkWeekly",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> sinkWeekly",
 						"selectDaily sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
+						"     partitionFileNames:['HA_Daily'],",
 						"     umask: 0022,",
 						"     preCommands: [],",
 						"     postCommands: [],",
 						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> sinkDaily"
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> sinkDaily"
 					]
 				}
 			},
@@ -721,6 +725,56 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/dataflows/df_tran_cases_deaths')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_process_hospital_addmission_data')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "HA data flow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.00:05:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "ds_trans_hospittal_admissions",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"sourceHospital": {},
+									"sourceCountryLookup": {},
+									"sourceDimDate": {},
+									"sinkWeekly": {},
+									"sinkDaily": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/ds_trans_hospittal_admissions')]"
 			]
 		},
 		{
