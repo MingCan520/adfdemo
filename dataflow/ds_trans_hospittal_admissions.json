@@ -147,7 +147,7 @@
 				"     skipDuplicateMapOutputs: true) ~> selectRequiredFields2",
 				"selectRequiredFields2 split(indicator == 'Weekly new hospital admissions per 100k' || indicator == 'Weekly new ICU admissions per 100k',",
 				"     disjoint: false) ~> splitDailyFromWeekly@(Weekly, Daily)",
-				"sourceDimDate aggregate(groupBy(ecdc_year_week = year + '-W' + lpad(week_of_year,2,'0')),",
+				"sourceDimDate aggregate(groupBy(ecdc_year_week = year+'-W'+lpad(week_of_year,2,'0')),",
 				"     week_start_date = min(date),",
 				"          week_end_date = max(date)) ~> aggregateDimDate",
 				"splitDailyFromWeekly@Weekly, aggregateDimDate join(reported_year_week == ecdc_year_week,",
@@ -207,18 +207,22 @@
 				"     skipDuplicateMapOutputs: true) ~> selectDaily",
 				"selectWeekly sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
+				"     partitionFileNames:[''],",
 				"     umask: 0022,",
 				"     preCommands: [],",
 				"     postCommands: [],",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> sinkWeekly",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sinkWeekly",
 				"selectDaily sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
+				"     partitionFileNames:[''],",
 				"     umask: 0022,",
 				"     preCommands: [],",
 				"     postCommands: [],",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> sinkDaily"
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sinkDaily"
 			]
 		}
 	}
